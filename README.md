@@ -109,9 +109,6 @@ http://127.0.0.1:5173
 Create a `.env` file inside `backend/`:
 
 ```
-# Example
-API_KEY=your_api_key_here
-```
 
 ⚠️ Never commit your `.env` file.
 
@@ -126,10 +123,6 @@ API_KEY=your_api_key_here
 * ☁️ Deployment (Vercel + cloud backend)
 
 ---
-
-## 📸 Screenshot
-
-*Add a screenshot of your dashboard here*
 
 ---
 
