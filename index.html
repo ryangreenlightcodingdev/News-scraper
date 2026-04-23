@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News Aggregator App</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4efe7;
+      --panel: #fffdf8;
+      --ink: #1a1816;
+      --muted: #6b625a;
+      --accent: #b64d2d;
+      --border: #dfd4c5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, rgba(182, 77, 45, 0.18), transparent 28%),
+        linear-gradient(180deg, #f8f3eb 0%, var(--bg) 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 64px 24px;
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 18px 48px rgba(53, 36, 24, 0.08);
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.75rem);
+      line-height: 0.94;
+      margin: 0 0 18px;
+      letter-spacing: -0.04em;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+      margin: 0 0 18px;
+    }
+
+    code {
+      background: #f0e4d6;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.94em;
+    }
+
+    .steps {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .steps a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <p>FastAPI + React</p>
+      <h1>News Aggregator Dashboard</h1>
+      <p>
+        This repo now contains a backend scraper/aggregator and a React dashboard
+        that combines tech news, Hacker News, general computer news, and
+        political news into one interface.
+      </p>
+      <p>
+        Start the API from <code>backend/</code>, start the frontend from
+        <code>frontend/</code>, and open the dashboard locally in your browser.
+      </p>
+      <div class="steps">
+        <p>
+          Setup and run instructions live in <a href="./README.md">README.md</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
