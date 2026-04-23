@@ -83,6 +83,7 @@ function App() {
             Fresh articles are stored locally, normalized into one schema, and refreshed
             automatically every 10 minutes by the FastAPI backend, including PubMed-powered
             research on IQ, neuropsychology, longevity, peptides, antiaging, and diet,
+            plus dedicated politics and latest-events categories,
             with stricter recency windows for news and wider rolling windows for science.
           </p>
         </div>

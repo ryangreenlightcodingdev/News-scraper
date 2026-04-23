@@ -145,6 +145,7 @@ def prune_stale_articles(db: Session) -> None:
         "hacker-news": now - timedelta(days=settings.news_recency_days),
         "computer-news": now - timedelta(days=settings.news_recency_days),
         "politics": now - timedelta(days=settings.news_recency_days),
+        "latest-events": now - timedelta(days=settings.news_recency_days),
         "iq": now - timedelta(days=120),
         "neuropsychology": now - timedelta(days=120),
         "diet": now - timedelta(days=90),

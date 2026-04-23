@@ -56,6 +56,24 @@ GENERAL_FEED_SOURCES = [
         kind="rss",
         url="https://apnews.com/hub/politics/rss",
     ),
+    FeedSource(
+        name="BBC Politics",
+        category="politics",
+        kind="rss",
+        url="http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/uk_politics/rss.xml",
+    ),
+    FeedSource(
+        name="BBC Latest Stories",
+        category="latest-events",
+        kind="rss",
+        url="http://news.bbc.co.uk/rss/newsonline_uk_edition/latest_published_stories/rss.xml",
+    ),
+    FeedSource(
+        name="BBC World",
+        category="latest-events",
+        kind="rss",
+        url="http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/world/rss.xml",
+    ),
 ]
 
 

@@ -4,7 +4,7 @@ A full-stack web app that aggregates technology, politics, and medical research 
 
 ## Features
 
-- News from tech, Hacker News, computer news, and politics
+- News from tech, Hacker News, computer news, politics, and latest events
 - Medical research topics added to the same board and filters:
   - `iq`
   - `neuropsychology`
@@ -13,6 +13,7 @@ A full-stack web app that aggregates technology, politics, and medical research 
   - `antiaging`
   - `diet`
 - Sources include PubMed plus selected ScienceDaily topic feeds
+- Politics and latest-events coverage include AP, Politico, and BBC RSS sources
 - Unified article format: `title`, `source`, `url`, `timestamp`, `summary`
 - FastAPI backend with SQLite storage and 10-minute refreshes
 - React frontend with category and source filters
