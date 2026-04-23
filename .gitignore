@@ -6,4 +6,4 @@ venv/
 backend/news_aggregator.db
 frontend/node_modules/
 frontend/dist/
-
+.env
