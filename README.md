@@ -1,70 +1,144 @@
-# News Aggregator Dashboard
+# 🧠 News Intelligence Dashboard
 
-A full-stack news dashboard that aggregates:
+A full-stack web app that aggregates tech, Hacker News, political, and medical research (peptides, longevity, brain health) into a single dashboard.
 
-- Tech news
-- Hacker News
-- General computer news
-- Political news
+## 🚀 Features
 
-The backend uses FastAPI, SQLite, SQLAlchemy, and APScheduler. The frontend uses React with Vite.
+* 🔥 Aggregates multiple news sources:
 
-## Features
+  * Tech news
+  * Hacker News
+  * Political news
+  * Medical research (peptides, anti-aging, longevity, brain health)
 
-- Normalized article format: `title`, `source`, `url`, `timestamp`
-- Additional metadata for `category` and `summary`
-- Background refresh every 10 minutes
-- Manual refresh endpoint and UI button
-- Source and category filters
-- SQLite persistence with deduplication by URL
+* 🧬 Research integration via PubMed (abstracts + summaries)
 
-## Project Structure
+* 📊 Clean dashboard UI with categories
 
-```text
-backend/
-  app/
-    main.py
-    config.py
-    database.py
-    models.py
-    schemas.py
-    services/
-frontend/
-  src/
+* ⚡ FastAPI backend + React frontend
+
+* 🔄 Auto-refreshing data pipeline
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend:** Python, FastAPI
+* **Frontend:** React, Vite
+* **Database:** SQLite
+* **Other:** Web scraping + APIs
+
+---
+
+## 📦 Project Structure
+
+```
+app-jobs/
+├── backend/
+│   ├── app/
+│   ├── requirements.txt
+│   └── .env (not included)
+├── frontend/
+│   ├── src/
+│   └── package.json
+└── README.md
 ```
 
-## Backend Setup
+---
 
-```bash
+## ⚙️ Getting Started
+
+### 1. Clone the repo
+
+```
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+```
+
+---
+
+### 2. Backend setup
+
+```
 cd backend
 python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/Scripts/activate   # Windows (Git Bash)
+# OR
+.venv\Scripts\activate          # PowerShell
+
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+---
+
+### 3. Run backend
+
+```
 uvicorn app.main:app --reload
 ```
 
-The API will run at `http://127.0.0.1:8000`.
+Backend will run at:
 
-Useful endpoints:
+```
+http://127.0.0.1:8000
+```
 
-- `GET /api/articles`
-- `GET /api/filters`
-- `POST /api/refresh`
-- `GET /health`
+---
 
-## Frontend Setup
+### 4. Frontend setup
 
-```bash
+Open a new terminal:
+
+```
 cd frontend
 npm install
 npm run dev
 ```
 
-The React app will run at `http://127.0.0.1:5173`.
+Frontend will run at:
 
-## Notes
+```
+http://127.0.0.1:5173
+```
 
-- The backend refreshes feeds on startup and then every 10 minutes.
-- The frontend expects the backend at `http://127.0.0.1:8000` by default.
-- You can change feed behavior in `backend/app/services/aggregator.py`.
+---
 
+## 🔐 Environment Variables
+
+Create a `.env` file inside `backend/`:
+
+```
+# Example
+API_KEY=your_api_key_here
+```
+
+⚠️ Never commit your `.env` file.
+
+---
+
+## 💡 Future Improvements
+
+* 🤖 AI-powered summaries
+* 📬 Email / daily digest
+* 👤 User personalization
+* 📈 Trending topics detection
+* ☁️ Deployment (Vercel + cloud backend)
+
+---
+
+## 📸 Screenshot
+
+*Add a screenshot of your dashboard here*
+
+---
+
+## 🧭 Vision
+
+This project aims to evolve into a **personal intelligence dashboard**—helping users stay on top of technology, global events, and cutting-edge health research in one place.
+
+---
+
+## 📄 License
+
+MIT
