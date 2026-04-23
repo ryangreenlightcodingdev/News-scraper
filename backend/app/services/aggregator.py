@@ -1,84 +1,27 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 import feedparser
 import requests
 from dateutil import parser as date_parser
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.models import Article
-
-
-@dataclass(frozen=True)
-class FeedSource:
-    name: str
-    category: str
-    kind: str
-    url: str
-    title_field: str = "title"
-    summary_field: str = "summary"
-
-
-FEED_SOURCES = [
-    FeedSource(
-        name="Hacker News",
-        category="hacker-news",
-        kind="json",
-        url="https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=25",
-        title_field="title",
-        summary_field="story_text",
-    ),
-    FeedSource(
-        name="TechCrunch",
-        category="tech",
-        kind="rss",
-        url="https://techcrunch.com/feed/",
-    ),
-    FeedSource(
-        name="The Verge",
-        category="tech",
-        kind="rss",
-        url="https://www.theverge.com/rss/index.xml",
-    ),
-    FeedSource(
-        name="Ars Technica",
-        category="computer-news",
-        kind="rss",
-        url="https://feeds.arstechnica.com/arstechnica/index",
-    ),
-    FeedSource(
-        name="Wired",
-        category="computer-news",
-        kind="rss",
-        url="https://www.wired.com/feed/rss",
-    ),
-    FeedSource(
-        name="Politico",
-        category="politics",
-        kind="rss",
-        url="https://www.politico.com/rss/politicopicks.xml",
-    ),
-    FeedSource(
-        name="AP Politics",
-        category="politics",
-        kind="rss",
-        url="https://apnews.com/hub/politics/rss",
-    ),
-]
+from app.services.medical_research import fetch_medical_research_articles
+from app.services.news_sources import FeedSource, GENERAL_FEED_SOURCES, MEDICAL_FEED_SOURCES
 
 
 def _normalize_text(value: str | None) -> str:
     return (value or "").strip()
 
 
-def _parse_datetime(value: str | None) -> datetime:
+def _parse_datetime(value: str | None) -> datetime | None:
     if not value:
-        return datetime.now(timezone.utc)
+        return None
 
     try:
         parsed = parsedate_to_datetime(value)
@@ -89,12 +32,17 @@ def _parse_datetime(value: str | None) -> datetime:
         try:
             parsed = date_parser.parse(value)
         except (TypeError, ValueError):
-            return datetime.now(timezone.utc)
+            return None
 
     if parsed.tzinfo is None:
         return parsed.replace(tzinfo=timezone.utc)
 
     return parsed.astimezone(timezone.utc)
+
+
+def _cutoff_for_source(source: FeedSource) -> datetime:
+    days = settings.news_recency_days if source in GENERAL_FEED_SOURCES else settings.medical_feed_recency_days
+    return datetime.now(timezone.utc) - timedelta(days=days)
 
 
 def fetch_json_source(source: FeedSource) -> list[dict]:
@@ -103,12 +51,14 @@ def fetch_json_source(source: FeedSource) -> list[dict]:
     payload = response.json()
     hits = payload.get("hits", [])
     articles = []
+    cutoff = _cutoff_for_source(source)
 
     for item in hits:
         title = _normalize_text(item.get(source.title_field))
         url = _normalize_text(item.get("url"))
+        timestamp = _parse_datetime(item.get("created_at"))
 
-        if not title or not url:
+        if not title or not url or timestamp is None or timestamp < cutoff:
             continue
 
         articles.append(
@@ -117,7 +67,7 @@ def fetch_json_source(source: FeedSource) -> list[dict]:
                 "source": source.name,
                 "category": source.category,
                 "url": url,
-                "timestamp": _parse_datetime(item.get("created_at")),
+                "timestamp": timestamp,
                 "summary": _normalize_text(item.get(source.summary_field)),
             }
         )
@@ -128,6 +78,7 @@ def fetch_json_source(source: FeedSource) -> list[dict]:
 def fetch_rss_source(source: FeedSource) -> list[dict]:
     parsed = feedparser.parse(source.url)
     articles = []
+    cutoff = _cutoff_for_source(source)
 
     for entry in parsed.entries:
         title = _normalize_text(getattr(entry, "title", None))
@@ -142,6 +93,10 @@ def fetch_rss_source(source: FeedSource) -> list[dict]:
             or getattr(entry, "created", None)
         )
         summary = getattr(entry, "summary", None) or getattr(entry, "description", None)
+        timestamp = _parse_datetime(published)
+
+        if not title or not url or timestamp is None or timestamp < cutoff:
+            continue
 
         articles.append(
             {
@@ -149,7 +104,7 @@ def fetch_rss_source(source: FeedSource) -> list[dict]:
                 "source": source.name,
                 "category": source.category,
                 "url": url,
-                "timestamp": _parse_datetime(published),
+                "timestamp": timestamp,
                 "summary": _normalize_text(summary),
             }
         )
@@ -160,7 +115,7 @@ def fetch_rss_source(source: FeedSource) -> list[dict]:
 def fetch_all_articles() -> list[dict]:
     collected: list[dict] = []
 
-    for source in FEED_SOURCES:
+    for source in [*GENERAL_FEED_SOURCES, *MEDICAL_FEED_SOURCES]:
         try:
             if source.kind == "json":
                 collected.extend(fetch_json_source(source))
@@ -170,6 +125,11 @@ def fetch_all_articles() -> list[dict]:
             # We keep the dashboard usable even if one source is temporarily down.
             continue
 
+    try:
+        collected.extend(fetch_medical_research_articles())
+    except Exception:
+        pass
+
     deduped: dict[str, dict] = {}
     for article in collected:
         deduped[article["url"]] = article
@@ -177,7 +137,31 @@ def fetch_all_articles() -> list[dict]:
     return sorted(deduped.values(), key=lambda item: item["timestamp"], reverse=True)
 
 
+def prune_stale_articles(db: Session) -> None:
+    now = datetime.now(timezone.utc)
+    default_cutoff = now - timedelta(days=settings.pubmed_default_recency_days)
+    category_cutoffs = {
+        "tech": now - timedelta(days=settings.news_recency_days),
+        "hacker-news": now - timedelta(days=settings.news_recency_days),
+        "computer-news": now - timedelta(days=settings.news_recency_days),
+        "politics": now - timedelta(days=settings.news_recency_days),
+        "iq": now - timedelta(days=120),
+        "neuropsychology": now - timedelta(days=120),
+        "diet": now - timedelta(days=90),
+        "peptides": now - timedelta(days=120),
+        "antiaging": now - timedelta(days=180),
+        "longevity": now - timedelta(days=180),
+    }
+
+    for category, cutoff in category_cutoffs.items():
+        db.execute(delete(Article).where(Article.category == category, Article.timestamp < cutoff))
+
+    db.execute(delete(Article).where(~Article.category.in_(list(category_cutoffs.keys())), Article.timestamp < default_cutoff))
+    db.commit()
+
+
 def refresh_articles(db: Session) -> tuple[int, int]:
+    prune_stale_articles(db)
     articles = fetch_all_articles()
     inserted = 0
 

@@ -78,10 +78,12 @@ function App() {
       <header className="hero">
         <div>
           <p className="eyebrow">Unified Newsroom</p>
-          <h1>One dashboard for tech, computers, Hacker News, and politics.</h1>
+          <h1>One dashboard for tech, politics, and medical research.</h1>
           <p className="hero-copy">
             Fresh articles are stored locally, normalized into one schema, and refreshed
-            automatically every 10 minutes by the FastAPI backend.
+            automatically every 10 minutes by the FastAPI backend, including PubMed-powered
+            research on IQ, neuropsychology, longevity, peptides, antiaging, and diet,
+            with stricter recency windows for news and wider rolling windows for science.
           </p>
         </div>
         <button className="refresh-button" onClick={handleRefresh} disabled={refreshing}>

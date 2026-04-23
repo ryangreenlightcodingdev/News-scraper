@@ -1,137 +1,47 @@
-# 🧠 News Intelligence Dashboard
+# News Intelligence Dashboard
 
-A full-stack web app that aggregates tech, Hacker News, political, and medical research (peptides, longevity, brain health) into a single dashboard.
+A full-stack web app that aggregates technology, politics, and medical research into one dashboard.
 
-## 🚀 Features
+## Features
 
-* 🔥 Aggregates multiple news sources:
+- News from tech, Hacker News, computer news, and politics
+- Medical research topics added to the same board and filters:
+  - `iq`
+  - `neuropsychology`
+  - `longevity`
+  - `peptides`
+  - `antiaging`
+  - `diet`
+- Sources include PubMed plus selected ScienceDaily topic feeds
+- Unified article format: `title`, `source`, `url`, `timestamp`, `summary`
+- FastAPI backend with SQLite storage and 10-minute refreshes
+- React frontend with category and source filters
 
-  * Tech news
-  * Hacker News
-  * Political news
-  * Medical research (peptides, anti-aging, longevity, brain health)
+## Run Locally
 
-* 🧬 Research integration via PubMed (abstracts + summaries)
+Backend:
 
-* 📊 Clean dashboard UI with categories
-
-* ⚡ FastAPI backend + React frontend
-
-* 🔄 Auto-refreshing data pipeline
-
----
-
-## 🛠️ Tech Stack
-
-* **Backend:** Python, FastAPI
-* **Frontend:** React, Vite
-* **Database:** SQLite
-* **Other:** Web scraping + APIs
-
----
-
-## 📦 Project Structure
-
-```
-app-jobs/
-├── backend/
-│   ├── app/
-│   ├── requirements.txt
-│   └── .env (not included)
-├── frontend/
-│   ├── src/
-│   └── package.json
-└── README.md
-```
-
----
-
-## ⚙️ Getting Started
-
-### 1. Clone the repo
-
-```
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
-```
-
----
-
-### 2. Backend setup
-
-```
+```powershell
 cd backend
 python -m venv .venv
-source .venv/Scripts/activate   # Windows (Git Bash)
-# OR
-.venv\Scripts\activate          # PowerShell
-
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
----
-
-### 3. Run backend
-
-```
+.\.venv\Scripts\activate
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Backend will run at:
+Frontend:
 
-```
-http://127.0.0.1:8000
-```
-
----
-
-### 4. Frontend setup
-
-Open a new terminal:
-
-```
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend will run at:
+Open `http://127.0.0.1:5173`.
 
-```
-http://127.0.0.1:5173
-```
+## Notes
 
----
-
-## 🔐 Environment Variables
-
-Create a `.env` file inside `backend/`:
-
-```
-
-⚠️ Never commit your `.env` file.
-
----
-
-## 💡 Future Improvements
-
-* 🤖 AI-powered summaries
-* 📬 Email / daily digest
-* 👤 User personalization
-* 📈 Trending topics detection
-* ☁️ Deployment (Vercel + cloud backend)
-
----
-
----
-
-## 🧭 Vision
-
-This project aims to evolve into a **personal intelligence dashboard**—helping users stay on top of technology, global events, and cutting-edge health research in one place.
-
----
-
-## 📄 License
-
-MIT
+- The dashboard layout stays the same; the new medical topics appear through the existing category and source filters.
+- PubMed papers are pulled through NCBI E-utilities, then summarized from abstract text when available.
+- Additional medical-related feed coverage comes from ScienceDaily topic RSS feeds for intelligence, memory, neuroscience, healthy aging, nutrition, and supplements.
+- Freshness is now enforced with rolling windows: news is kept tighter, while science categories use wider category-specific windows so slower-moving research areas still surface the latest meaningful work.
